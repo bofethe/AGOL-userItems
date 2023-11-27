@@ -1,0 +1,1 @@
+This funciton will take provide a spreadsheet containing the details of all content owned by an ArcGIS Online user. This script requires `arcgis` and `pandas` to be installed.
