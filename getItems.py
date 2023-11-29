@@ -8,14 +8,33 @@ def getItems(link, u, p):
     # Authenticate
     gis = arcgis.gis.GIS(url = link, username=u, password=p)
 
+    # Get folder names
+    folderNames = pd.DataFrame(gis.users.me.folders)['title'].to_list()
+    folderNames.insert(0, None) # Put the root folder in the begining of list
+
     # Get info in a dataframe
-    itemList = gis.users.search(u)[0].items() #NOTE This only looks at the root folder.  Pass items(folder='name') if needed.
-    itemDF = pd.DataFrame(itemList)
+    dfList = []
+    for folderName in folderNames:
+        itemList = gis.users.search(u)[0].items(folder=folderName)
+        itemDF = pd.DataFrame(itemList)
 
-    # Reduce the number of fields exported
-    keeps = ['id', 'name', 'type', 'access', 'size']
-    itemDF_select = itemDF[keeps]
+        # Skip empty folders
+        if itemDF.empty:
+            continue
 
-    # Export the dataframe
+        # Reduce the number of fields exported
+        keeps = ['id', 'title', 'type', 'access', 'size']
+        itemDF_select = itemDF[keeps].copy()
+
+        # Store dataframe in list
+        itemDF_select['folder'] = folderName
+        dfList.append(itemDF_select)
+
+    # Combine dataframes and export
+    df = pd.concat(dfList)
+
     outputName = u + '_content.xlsx'
-    itemDF_select.to_excel(outputName, index=False)
+    df.to_excel(outputName, index=False)
+
+    #Return user dataframe
+    return df
