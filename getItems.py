@@ -3,7 +3,7 @@ import pandas as pd
 
 def getItems(link, u, p):
     '''
-    This function takes the portal's URL, username, and password and saves an excel file in the home directory.
+    This function takes the portal's URL, username, and password and saves an excel file in the home directory with the user item details.
     '''
     # Authenticate
     gis = arcgis.gis.GIS(url = link, username=u, password=p)
